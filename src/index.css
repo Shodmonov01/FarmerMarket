@@ -1,0 +1,162 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  
+  --telegram-bg: #ffffff;
+  --telegram-text: #000000;
+  --telegram-accent: #2AABEE;
+  --telegram-secondary: #f0f2f5;
+  --telegram-green: #4CAF50;
+  --telegram-red: #f44336;
+  --telegram-border: #e5e7eb;
+  
+  color: var(--telegram-text);
+  background-color: var(--telegram-bg);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 3.9%;
+    --primary: 196 94% 48%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 210 20% 96%;
+    --secondary-foreground: 0 0% 9%;
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 0 0% 45.1%;
+    --accent: 0 0% 96.1%;
+    --accent-foreground: 0 0% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --success: 142 69% 58%;
+    --success-foreground: 0 0% 98%;
+    --border: 0 0% 89.8%;
+    --input: 0 0% 89.8%;
+    --ring: 196 94% 48%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+.telegram-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+/* Custom animation classes */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInBottom {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes zoomIn {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 300ms ease-out;
+}
+
+.slide-in-bottom {
+  animation: slideInBottom 300ms ease-out;
+}
+
+.zoom-in {
+  animation: zoomIn 300ms ease-out;
+}
+
+.telegram-button {
+  @apply bg-primary text-white font-medium py-2 px-4 rounded-lg transition-all hover:bg-primary/90 active:scale-95;
+}
+
+.telegram-card {
+  @apply bg-white rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.form-input {
+  @apply border border-input rounded-md px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent;
+}
+
+/* Category pills */
+.category-pill {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-medium;
+}
+
+.category-pill-berries {
+  @apply bg-red-100 text-red-800;
+}
+
+.category-pill-fruits {
+  @apply bg-orange-100 text-orange-800;
+}
+
+.category-pill-vegetables {
+  @apply bg-green-100 text-green-800;
+}
+
+/* Verified badge */
+.verified-badge {
+  @apply inline-flex items-center gap-1 text-primary;
+}
+
+/* Subscription badge */
+.subscription-badge {
+  @apply bg-success/20 text-success px-2 py-0.5 rounded text-xs font-medium;
+}
+
+/* Price tag */
+.price-tag {
+  @apply font-bold text-lg;
+}
