@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 import { AuthContext } from '@/context/AuthContext';
@@ -39,13 +39,13 @@ export default function Header() {
       <div className="telegram-container">
         <div className="flex items-center justify-between h-14" >
           <div className="flex items-center">
-            {showBackButton ? (
+            {/* {showBackButton ? (
               <Link to="/\" className="mr-3">
                 <Button variant="ghost" size="icon">
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
               </Link>
-            ) : null}
+            ) : null} */}
             <motion.h1
               initial={{ opacity: 0, y: -5 }}
               animate={{ opacity: 1, y: 0 }}
@@ -55,17 +55,25 @@ export default function Header() {
             </motion.h1>
 
           </div>
-            <div className="mr-1">
-                  {isAuthenticated ? (
-                    <Button variant="destructive" onClick={logout} className="w-full">
-                      Выйти
-                    </Button>
-                  ) : (
-                    <Link to="/register">
-                      <Button className="w-full">Войти</Button>
-                    </Link>
-                  )}
-                </div>
+          <div className="mr-1">
+  {isAuthenticated ? (
+    <Button 
+      variant="destructive" 
+      onClick={logout} 
+      className="w-full gap-2"
+    >
+      <LogOut className="h-4 w-4" />
+      Выйти
+    </Button>
+  ) : (
+    <Link to="/register">
+      <Button className="w-full gap-2">
+        <LogIn className="h-4 w-4" />
+        Войти
+      </Button>
+    </Link>
+  )}
+</div>
           
        
         </div>

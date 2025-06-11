@@ -5,8 +5,14 @@ import ListingFilter, { FilterValues } from '@/components/listings/ListingFilter
 import { Category, Listing } from '@/types';
 import { getCategories } from '@/api/products';
 
+const Loading = () => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
+
 export default function HomePage() {
-  const { listings } = useContext(ListingContext);
+  const { listings, loading } = useContext(ListingContext); // Assume ListingContext provides a loading state
   const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<FilterValues>({
     search: '',
@@ -15,7 +21,7 @@ export default function HomePage() {
     location: '',
   });
 
-  // Загружаем категории
+  // Load categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -28,10 +34,10 @@ export default function HomePage() {
     fetchCategories();
   }, []);
 
-  // Применяем фильтры к объявлениям
+  // Apply filters to listings
   const filteredListings = useMemo(() => {
     return listings.filter(listing => {
-      // Фильтр по тексту поиска
+      // Search filter
       if (
         filters.search &&
         !listing.title.toLowerCase().includes(filters.search.toLowerCase()) &&
@@ -40,17 +46,17 @@ export default function HomePage() {
         return false;
       }
 
-      // Фильтр по категории
+      // Category filter
       if (filters.category !== 'all' && listing.category !== filters.category) {
         return false;
       }
 
-      // Фильтр по ценовому диапазону
+      // Price range filter
       if (listing.price < filters.priceRange[0] || listing.price > filters.priceRange[1]) {
         return false;
       }
 
-      // Фильтр по местоположению
+      // Location filter
       if (filters.location && listing.location !== filters.location) {
         return false;
       }
@@ -67,7 +73,9 @@ export default function HomePage() {
     <div className="mt-4">
       <ListingFilter categories={categories} onFilterChange={handleFilterChange} />
 
-      {filteredListings.length === 0 ? (
+      {loading ? (
+        <Loading />
+      ) : filteredListings.length === 0 ? (
         <div className="text-center py-10">
           <h3 className="text-lg font-semibold mb-2">Объявления не найдены</h3>
           <p className="text-muted-foreground">
