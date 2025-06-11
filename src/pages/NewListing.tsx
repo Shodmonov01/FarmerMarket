@@ -1,4 +1,3 @@
-
 import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
@@ -25,13 +24,20 @@ import {
 import { AuthContext } from '@/context/AuthContext';
 import { ListingContext } from '@/context/ListingContext';
 import { getDaysRemaining } from '@/lib/utils';
-import { categories, units } from '@/mock/data';
 import { Image, X, Upload } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { createProduct } from '@/api/productsByOwners';
+import { Category } from '@/types';
+import { getCategories } from '@/api/products';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+
+const units = [
+  { value: 'kg', label: 'кг' },
+  { value: 'liter', label: 'литр' },
+  { value: 'piece', label: 'штука' },
+];
 
 const formSchema = z.object({
   name: z.string().min(5, 'Название должно содержать не менее 5 символов'),
@@ -39,7 +45,7 @@ const formSchema = z.object({
   price: z.coerce.number().positive('Цена должна быть положительной'),
   unit_type: z.enum(['kg', 'liter', 'piece']),
   pcs: z.coerce.number().int().nonnegative('Количество должно быть целым числом'),
-  category: z.enum(['Berries', 'Fruits', 'Vegetables']),
+  category: z.string().min(1, 'Выберите категорию'),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -53,6 +59,20 @@ export default function NewListingPage() {
   const [loading, setLoading] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  // Load categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const fetchedCategories = await getCategories();
+        setCategories(fetchedCategories);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -83,7 +103,7 @@ export default function NewListingPage() {
       price: 0,
       unit_type: 'kg',
       pcs: 0,
-      category: 'Vegetables',
+      category: '',
     },
   });
 
@@ -158,34 +178,25 @@ export default function NewListingPage() {
     setLoading(true);
 
     try {
-      // Маппинг категорий на числовые идентификаторы
-      const categoryMap: Record<string, number> = {
-        Berries: 1,
-        Fruits: 2,
-        Vegetables: 3,
-      };
-
-      const productData: ProductData = {
+      const productData = {
         name: data.name,
         description: data.description,
         unit_type: data.unit_type,
         pcs: data.pcs,
         price: data.price,
         images: imageFiles,
-        category: categoryMap[data.category],
-        // owner: user.id,
+        category: data.category,
       };
 
       await createProduct(productData);
 
-      // Добавляем в локальный контекст для отображения
       addListing({
         title: data.name,
         description: data.description,
         price: data.price,
         unit: data.unit_type,
         category: data.category,
-        images: imagePreviews, // Используем превью для отображения
+        images: imagePreviews,
         sellerId: user.id,
         location: user.location,
       });
@@ -306,7 +317,7 @@ export default function NewListingPage() {
                     <SelectContent>
                       {units.map((unit) => (
                         <SelectItem key={unit.value} value={unit.value}>
-                          {unit.label === 'kg' ? 'кг' : unit.label === 'liter' ? 'литр' : 'штука'}
+                          {unit.label}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -345,8 +356,8 @@ export default function NewListingPage() {
                   </FormControl>
                   <SelectContent>
                     {categories.map((category) => (
-                      <SelectItem key={category.value} value={category.value}>
-                        {category.label === 'Berries' ? 'Ягоды' : category.label === 'Fruits' ? 'Фрукты' : 'Овощи'}
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        {category.name}
                       </SelectItem>
                     ))}
                   </SelectContent>

@@ -106,9 +106,9 @@ export default function ListingCard({ listing, onEdit, onDelete, isEditable = fa
         <CardFooter className="pt-0 pb-4 flex-col">
           {isEditable && user?.id === listing.sellerId ? (
             <div className="flex gap-2 w-full">
-              <Button variant="outline" className="flex-1" onClick={onEdit}>
+              {/* <Button variant="outline" className="flex-1" onClick={onEdit}>
                 Редактировать
-              </Button>
+              </Button> */}
               <Button variant="destructive" className="flex-1" onClick={onDelete}>
                 Удалить
               </Button>
