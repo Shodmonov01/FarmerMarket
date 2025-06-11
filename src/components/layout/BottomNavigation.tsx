@@ -53,6 +53,7 @@ export default function BottomNavigation() {
           to="/"
           icon={<Home className="h-5 w-5" />}
           label="Главная"
+          requireAuth
         />
         
         <NavItem

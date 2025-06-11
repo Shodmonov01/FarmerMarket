@@ -74,33 +74,43 @@
 
 // export default App;
 
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { Toaster } from '@/components/ui/toaster';
 import { init } from '@telegram-apps/sdk';
 
-// Pages
-import HomePage from '@/pages/Home';
-import RegisterPage from '@/pages/Register';
-import SubscribePage from '@/pages/Subscribe';
-import NewListingPage from '@/pages/NewListing';
-import AdminPage from '@/pages/Admin';
-import SellerProfilePage from '@/pages/SellerProfile';
-import NotFoundPage from '@/pages/NotFound';
-
-// Layout
+// Layout (не леним, так как используется сразу)
 import MainLayout from '@/components/layout/MainLayout';
 
 // Context Providers
 import { ListingProvider } from '@/context/ListingContext';
 import { AuthProvider } from '@/context/AuthContext';
 
+// Lazy-loaded pages
+const HomePage = lazy(() => import('@/pages/Home'));
+const RegisterPage = lazy(() => import('@/pages/Register'));
+const SubscribePage = lazy(() => import('@/pages/Subscribe'));
+const NewListingPage = lazy(() => import('@/pages/NewListing'));
+const AdminPage = lazy(() => import('@/pages/Admin'));
+const SellerProfilePage = lazy(() => import('@/pages/SellerProfile'));
+const NotFoundPage = lazy(() => import('@/pages/NotFound'));
+
+// Loading component
+const Loading = () => (
+  <div className="flex justify-center items-center h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+  </div>
+);
+
 function App() {
   useEffect(() => {
-    // Simulate Telegram WebApp initialization
+    // Initialize app
     document.title = 'Farmers Market';
+    initTelegramWebApp();
+  }, []);
 
-    // Try to mock the Telegram WebApp bridge for testing
+  const initTelegramWebApp = () => {
+    // Mock for development
     if (!window.Telegram) {
       window.Telegram = {
         WebApp: {
@@ -123,40 +133,35 @@ function App() {
     // Initialize Telegram WebApp SDK
     try {
       const { requestFullscreen, ready, expand } = init();
-
-      // Call ready method to notify Telegram WebApp that we are ready
       window.Telegram?.WebApp?.ready();
       ready();
-
-      // Expand the WebApp to take full height
       window.Telegram?.WebApp?.expand();
       expand();
-
-      // Enable fullscreen mode by default
+      
       if (requestFullscreen.isAvailable()) {
-        requestFullscreen().catch((err) => {
-          console.error('Failed to enable fullscreen mode:', err);
-        });
+        requestFullscreen().catch(console.error);
       }
     } catch (err) {
-      console.error('Failed to initialize Telegram WebApp SDK:', err);
+      console.error('Telegram WebApp init error:', err);
     }
-  }, []);
+  };
 
   return (
     <Router>
       <AuthProvider>
         <ListingProvider>
           <MainLayout>
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/subscribe" element={<SubscribePage />} />
-              <Route path="/new-listing" element={<NewListingPage />} />
-              <Route path="/admin" element={<AdminPage />} />
-              <Route path="/seller/:id" element={<SellerProfilePage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+            <Suspense fallback={<Loading />}>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/register" element={<RegisterPage />} />
+                <Route path="/subscribe" element={<SubscribePage />} />
+                <Route path="/new-listing" element={<NewListingPage />} />
+                <Route path="/admin" element={<AdminPage />} />
+                <Route path="/seller/:id" element={<SellerProfilePage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
           </MainLayout>
           <Toaster />
         </ListingProvider>
