@@ -15,10 +15,9 @@ export default function HomePage() {
   const { listings, loading } = useContext(ListingContext); // Assume ListingContext provides a loading state
   const [categories, setCategories] = useState<Category[]>([]);
   const [filters, setFilters] = useState<FilterValues>({
-    search: '',
+    // search: '',
     category: 'all',
-    priceRange: [0, 1000],
-    location: '',
+    // location: '',
   });
 
   // Load categories
@@ -46,15 +45,15 @@ export default function HomePage() {
         return false;
       }
 
-      // Category filter
+      // // Category filter
       if (filters.category !== 'all' && listing.category !== filters.category) {
         return false;
       }
 
       // Price range filter
-      if (listing.price < filters.priceRange[0] || listing.price > filters.priceRange[1]) {
-        return false;
-      }
+      // if (listing.price < filters.priceRange[0] || listing.price > filters.priceRange[1]) {
+      //   return false;
+      // }
 
       // Location filter
       if (filters.location && listing.location !== filters.location) {
@@ -68,7 +67,9 @@ export default function HomePage() {
   const handleFilterChange = (newFilters: FilterValues) => {
     setFilters(newFilters);
   };
-
+  console.log('Фильтры:', filters);
+  console.log('Фильтруемые категории:', listings.map(l => l.category));
+  
   return (
     <div className="mt-4">
       <ListingFilter categories={categories} onFilterChange={handleFilterChange} />

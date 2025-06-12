@@ -31,7 +31,7 @@ export default function ListingCard({ listing, onEdit, onDelete, isEditable = fa
       });
       return;
     }
-    window.open(getTelegramLink(listing.sellerTelegramUsername), '_blank');
+    window.open(getTelegramLink(listing?.sellerTelegramUsername), '_blank');
   };
 
   return (
@@ -88,7 +88,7 @@ export default function ListingCard({ listing, onEdit, onDelete, isEditable = fa
 
           <div className="mb-3">
             <span className={`category-pill ${getCategoryClass(listing.category)}`}>
-              {listing.category}
+              {listing.category.name}
             </span>
           </div>
 
@@ -96,15 +96,15 @@ export default function ListingCard({ listing, onEdit, onDelete, isEditable = fa
 
           <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
             <Link to={`/seller/${listing.sellerId}`} className="hover:underline flex items-center">
-              От {listing.sellerName}
-              {listing.sellerVerified && <span className="verified-badge ml-1">✓</span>}
+              От {listing?.sellerName}
+              {listing?.sellerVerified && <span className="verified-badge ml-1">✓</span>}
             </Link>
-            <span>{formatDate(listing.createdAt)}</span>
+            {/* <span>{formatDate(listing?.createdAt)}</span> */}
           </div>
         </CardContent>
 
         <CardFooter className="pt-0 pb-4 flex-col">
-          {isEditable && user?.id === listing.sellerId ? (
+          {isEditable && user?.id === listing?.sellerId ? (
             <div className="flex gap-2 w-full">
               {/* <Button variant="outline" className="flex-1" onClick={onEdit}>
                 Редактировать

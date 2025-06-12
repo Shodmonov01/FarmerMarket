@@ -283,7 +283,9 @@ export default function SubscribePage() {
   const [tarifsLoading, setTarifsLoading] = useState(false);
   const [tarifsError, setTarifsError] = useState<string | null>(null);
   const [debugInfo, setDebugInfo] = useState<string[]>([]);
-
+  const [tariffs, setTariffs] = useState<Tariff[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   // Функция для добавления отладочной информации
   const addDebugInfo = (info: string) => {
     setDebugInfo(prev => [...prev, `${new Date().toLocaleTimeString()}: ${info}`]);
@@ -326,59 +328,53 @@ export default function SubscribePage() {
       return;
     }
 
-    addDebugInfo('Компонент загружен, пользователь авторизован');
-    loadTariffs();
+    const fetchTariffs = async () => {
+      setLoading(true);
+      try {
+        const data = await getTariffs();
+        setTariffs(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Неизвестная ошибка');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTariffs();
   }, [isAuthenticated, navigate, toast]);
 
-  // Получаем оставшиеся дни текущей подписки
+  // Оставшиеся дни подписки
   const daysRemaining = user?.subscriptionEnd ? getDaysRemaining(user.subscriptionEnd) : 0;
 
   const handleSelectPlan = (planId: string) => {
     setSelectedPlan(planId);
-    addDebugInfo(`Выбран план: ${planId}`);
   };
 
-  const completeSubscription = () => {
-    if (!selectedPlan || !user) return;
+  const completeSubscription = (tariff: Tariff) => {
+    if (!user) return;
 
-    const plan = apiTariffs.find(p => p.id.toString() === selectedPlan);
-    if (!plan) return;
-
-    // Рассчитываем новую дату окончания подписки на основе duration
-    const monthsToAdd = plan.duration;
+    // Рассчитываем новую дату окончания подписки
     const now = new Date();
-    const baseDate = (user.subscriptionEnd && getDaysRemaining(user.subscriptionEnd) > 0) 
-      ? user.subscriptionEnd 
-      : now;
+    const baseDate = user.subscriptionEnd && daysRemaining > 0 ? user.subscriptionEnd : now;
+    const newEndDate = addMonths(baseDate, tariff.duration);
 
-    const newEndDate = addMonths(baseDate, monthsToAdd);
-
+    // Обновляем пользователя
     updateUser({
+      tariff, // Сохраняем весь объект тарифа
       subscriptionEnd: newEndDate,
-      subscriptionPlan: `${plan.duration} month${plan.duration > 1 ? 's' : ''}` as PlanType,
     });
 
     toast({
       title: "Подписка оформлена",
-      description: `Вы успешно подключили тариф на ${plan.duration} месяц${plan.duration > 1 ? 'а' : ''}.`,
+      description: `Вы успешно подключили тариф "${tariff.name}".`,
     });
 
-    navigate('/');
+    // navigate('/');
   };
 
+
   // Преобразование тарифов из API в формат, подходящий для SubscriptionPlan
-  const formattedTariffs = apiTariffs.map(plan => ({
-    id: plan.id.toString(),
-    name: `${plan.duration} месяц${plan.duration > 1 ? 'а' : ''}` as PlanType,
-    price: plan.price,
-    description: plan.description || `Тариф на ${plan.duration} месяц${plan.duration > 1 ? 'а' : ''}`,
-    features: [
-      plan.listing_limit ? `Лимит объявлений: ${plan.listing_limit}` : 'Без лимита объявлений',
-      plan.enhanced_profile ? 'Расширенный профиль' : 'Базовый профиль',
-      plan.priority_support ? 'Приоритетная поддержка' : 'Стандартная поддержка',
-      plan.featured_listings ? 'Выделенные объявления' : 'Стандартные объявления',
-    ],
-  }));
+ 
 
   return (
     <div className="max-w-lg mx-auto py-4">
@@ -388,44 +384,57 @@ export default function SubscribePage() {
           Подписка позволит вам продавать свои товары на нашей платформе
         </p>
 
-        {user?.subscriptionEnd && daysRemaining > 0 && (
+        {user?.tariff && daysRemaining > 0 && (
           <div className="mt-4 p-3 bg-secondary rounded-lg flex items-center gap-2">
             <Timer className="h-5 w-5 text-primary" />
             <span className="text-sm">
-              У вас осталось <span className="font-semibold">{daysRemaining} дней</span> по тарифу "{user.subscriptionPlan}"
+              У вас активен тариф "{user.tariff.name}" ({daysRemaining} дней осталось)
             </span>
           </div>
         )}
       </div>
 
+      {loading && <div className="text-center">Загрузка тарифов...</div>}
+      {error && <div className="text-center text-red-600">{error}</div>}
+
       <div className="space-y-4">
-        {tarifsLoading ? (
-          <div className="text-center">Загрузка тарифов...</div>
-        ) : tarifsError ? (
-          <div className="text-center text-red-600">Ошибка загрузки тарифов: {tarifsError}</div>
-        ) : apiTariffs.length === 0 ? (
-          <div className="text-center">Тарифы не найдены</div>
-        ) : (
-          formattedTariffs.map((plan) => (
-            <SubscriptionPlan
-              key={plan.id}
-              plan={plan}
-              isSelected={selectedPlan === plan.id}
-              onSelect={() => handleSelectPlan(plan.id)}
-            />
-          ))
-        )}
+        {tariffs.map((tariff) => (
+          <SubscriptionPlan
+            key={tariff.id}
+            plan={{
+              id: tariff.id.toString(),
+              name: tariff.name,
+              price: tariff.price,
+              //@ts-expect-error скоро исправим
+              duration: tariff.duration,
+              description: tariff.description,
+              features: [
+                tariff.listing_limit > 2000
+                ? 'Безлимит товаров'
+                : `Лимит объявлений: ${tariff.listing_limit}`,
+                ...(tariff.enhanced_profile ? ['Расширенный профиль'] : ['Базовый профиль']),
+                ...(tariff.priority_support ? ['Приоритетная поддержка'] : []),
+                ...(tariff.featured_listings ? ['Выделенные объявления'] : []),
+              ],
+            }}
+            isSelected={selectedPlan === tariff.id.toString()}
+            onSelect={() => handleSelectPlan(tariff.id.toString())}
+          />
+        ))}
       </div>
 
-     <div className="space-y-4 mt-3">
-     {selectedPlan && (
-        <PaymentButton
-          tariffId={Number(selectedPlan)}
-          buttonText="Оформить подписку"
-          onSuccess={completeSubscription}
-        />
+      {selectedPlan && (
+        <div className="mt-6">
+          <PaymentButton
+            tariffId={Number(selectedPlan)}
+            buttonText="Оформить подписку"
+            onSuccess={() => {
+              const selectedTariff = tariffs.find(t => t.id.toString() === selectedPlan);
+              if (selectedTariff) completeSubscription(selectedTariff);
+            }}
+          />
+        </div>
       )}
-     </div>
     </div>
   );
 }

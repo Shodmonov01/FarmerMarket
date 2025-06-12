@@ -1,15 +1,23 @@
 import apiRequest from ".";
 
-
+interface Tariff {
+  name: string;
+  // возможно есть и другие поля, которые ты получаешь с API
+}
 // Типы для данных пользователя
-interface User {
+export interface User {
   id: number;
-  first_name: string;
-  username?: string;
-  avatarUrl?: string;
-  isVerified?: boolean;
-  location?: string;
-  phone?: string;
+  name: string;
+  telegramUsername: string;
+  avatarUrl: string;
+  location: string;
+  phone: string;
+  isVerified: boolean;
+  email?: string;
+  lastName?: string;
+  telegramId?: number;
+  description?: string;
+  tariff?: Tariff; // 💥 Добавь это
 }
 
 // Эндпоинт для авторизации через Telegram

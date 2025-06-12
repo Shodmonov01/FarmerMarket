@@ -2,17 +2,31 @@ export type Category = 'Berries' | 'Fruits' | 'Vegetables';
 export type Unit = 'kg' | 'liter' | 'piece';
 export type SubscriptionPlan = '1 month' | '3 months' | '6 months';
 
-export interface User {
-  id: string;
+export interface Tariff {
+  id: number;
   name: string;
+  price: number;
+  duration: number;
+  listing_limit: number;
+  description: string;
+  enhanced_profile: boolean;
+  featured_listings: boolean;
+  priority_support: boolean;
+}
+
+export interface User {
+  id?: number;
+  telegramId: number;
+  name: string;
+  lastName?: string;
+  telegramUsername: string;
+  avatarUrl: string;
   location: string;
   phone: string;
+  email?: string | null;
   isVerified: boolean;
-  avatarUrl?: string;
-  subscriptionEnd?: Date | null;
-  subscriptionPlan?: SubscriptionPlan | null;
-  isAdmin?: boolean;
-  telegramUsername?: string;
+  tariff?: Tariff | null;
+  description?: string;
 }
 
 export interface Listing {

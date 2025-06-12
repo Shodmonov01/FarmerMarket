@@ -68,7 +68,7 @@ export const getOwnerProducts = async () => {
     throw new Error('Access token not found in localStorage');
   }
 
-  return apiRequest<ProductDetail[]>('/shop/products/owner/', 'GET', {
+  return apiRequest<ProductDetail[]>('/api/shop/products/owner/', 'GET', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

@@ -85,15 +85,33 @@ export default function NewListingPage() {
       return;
     }
 
-    if (user && (!user.subscriptionEnd || getDaysRemaining(user.subscriptionEnd) <= 0)) {
-      toast({
-        title: 'Требуется подписка',
-        description: 'Для создания объявлений необходима активная подписка.',
-        variant: 'destructive',
-      });
-      navigate('/subscribe');
+    // Новая логика проверки подписки
+    if (user) {
+      const canCreateListing = checkSubscription(user);
+      if (!canCreateListing) {
+        toast({
+          title: 'Требуется подписка',
+          description: 'Для создания объявлений необходима активная подписка.',
+          variant: 'destructive',
+        });
+        navigate('/subscribe');
+      }
     }
   }, [isAuthenticated, user, navigate, toast]);
+
+  // Функция проверки подписки
+  const checkSubscription = (user: User): boolean => {
+    // Если у пользователя нет тарифа - нельзя создавать объявления
+    if (!user.tariff) return false;
+    
+    // Если есть subscriptionEnd, проверяем его
+    if (user.subscriptionEnd) {
+      return getDaysRemaining(user.subscriptionEnd) > 0;
+    }
+    
+    // Если нет subscriptionEnd, но есть тариф - считаем, что подписка активна
+    return true;
+  };
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),

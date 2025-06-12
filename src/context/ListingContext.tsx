@@ -35,7 +35,7 @@ export const ListingProvider = ({ children }: { children: ReactNode }) => {
           description: product.description || 'Описание отсутствует',
           price: product.price,
           unit: product.unit_type,
-          category: categoryMap.get(product.category.id) || 'Неизвестно',
+          category: product.category ? categoryMap.get(product.category.id) || 'Неизвестно' : 'Неизвестно',
           images: product.images.map(img => img.image_url),
           sellerId: product.owner.id.toString(),
           location: 'Не указано', // Если местоположение есть в API, добавьте его

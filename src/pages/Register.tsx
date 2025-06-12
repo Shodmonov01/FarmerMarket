@@ -35,6 +35,67 @@ export default function RegisterPage() {
     TelegramWebApp.expand();
   }, []);
 
+  // const handleTelegramLogin = async () => {
+  //   if (!initData) {
+  //     toast({
+  //       title: 'Ошибка',
+  //       description: 'Не удалось получить данные Telegram',
+  //       variant: 'destructive',
+  //     });
+  //     return;
+  //   }
+  
+  //   setLoading(true);
+  
+  //   try {
+  //     const response = await authTelegram(initData);
+  //     console.log('Full response:', response); // Для отладки
+  
+  //     // Проверяем структуру ответа
+  //     const { access_token, refresh_token } = response || {};
+  //     if (!access_token || !refresh_token) {
+  //       throw new Error('Токены не найдены в ответе сервера');
+  //     }
+  
+  //     // Сохраняем токены в localStorage
+  //     localStorage.setItem('access_token', access_token);
+  //     localStorage.setItem('refresh_token', refresh_token);
+  
+  //     // Получаем данные профиля
+  //     const profileResponse = await getProfile();
+  //     const userData = profileResponse;
+  
+  //     const user: User = {
+  //       id: userData?.id,
+  //       telegramId: userData?.telegram_id, // Сохраняем telegram_id
+  //       name: userData?.first_name || 'Пользователь Telegram', // Используем first_name
+  //       telegramUsername: userData?.username || `user_${Date.now()}`, // Используем username
+  //       avatarUrl: userData?.avatar_url || `https://i.pravatar.cc/300?u=${Date.now()}`, // Используем avatar
+  //       location: userData?.location || 'Не указан', // Если location null, используем дефолт
+  //       phone: userData?.phone_number || 'Не указан', // Если phone_number null, используем дефолт
+  //       isVerified: userData?.verified || false, // Используем verified
+  //     };
+  
+  //     login(user);
+  
+  //     toast({
+  //       title: 'Успешная регистрация',
+  //       description: 'Добро пожаловать на Фермерский рынок! Теперь вы можете продавать свои товары.',
+  //     });
+  
+  //     navigate('/');
+  //   } catch (error) {
+  //     toast({
+  //       title: 'Ошибка',
+  //       description: error instanceof Error ? error.message : 'Не удалось авторизоваться',
+  //       variant: 'destructive',
+  //     });
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+
   const handleTelegramLogin = async () => {
     if (!initData) {
       toast({
@@ -49,31 +110,31 @@ export default function RegisterPage() {
   
     try {
       const response = await authTelegram(initData);
-      console.log('Full response:', response); // Для отладки
+      console.log('Full response:', response);
   
-      // Проверяем структуру ответа
       const { access_token, refresh_token } = response || {};
       if (!access_token || !refresh_token) {
         throw new Error('Токены не найдены в ответе сервера');
       }
   
-      // Сохраняем токены в localStorage
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);
   
-      // Получаем данные профиля
       const profileResponse = await getProfile();
       const userData = profileResponse;
   
       const user: User = {
-        id: userData?.id,
-        telegramId: userData?.telegram_id, // Сохраняем telegram_id
-        name: userData?.first_name || 'Пользователь Telegram', // Используем first_name
-        telegramUsername: userData?.username || `user_${Date.now()}`, // Используем username
-        avatarUrl: userData?.avatar_url || `https://i.pravatar.cc/300?u=${Date.now()}`, // Используем avatar
-        location: userData?.location || 'Не указан', // Если location null, используем дефолт
-        phone: userData?.phone_number || 'Не указан', // Если phone_number null, используем дефолт
-        isVerified: userData?.verified || false, // Используем verified
+        id: userData.id,
+        telegramId: userData.telegram_id,
+        name: userData.first_name || 'Пользователь Telegram',
+        telegramUsername: userData.username || `user_${Date.now()}`,
+        avatarUrl: userData.avatar_url || `https://i.pravatar.cc/300?u=${Date.now()}`,
+        location: userData.location || 'Не указан',
+        phone: userData.phone_number || 'Не указан',
+        isVerified: userData.verified || false,
+        tariff: userData.tariff, // Сохраняем информацию о тарифе
+        email: userData.email,
+        lastName: userData.last_name,
       };
   
       login(user);
@@ -94,7 +155,6 @@ export default function RegisterPage() {
       setLoading(false);
     }
   };
-
   return (
     <div className="max-w-md mx-auto py-6">
       <motion.div

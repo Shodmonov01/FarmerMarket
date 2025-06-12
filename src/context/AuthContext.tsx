@@ -126,18 +126,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Инициализация Telegram Web App и получение initData только для отладки
     TelegramWebApp.ready();
     const initData = TelegramWebApp.initData;
     console.log('Telegram initData:', initData);
-
-    // Проверяем сохранённого пользователя из localStorage при загрузке
+  
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
         const parsedUser = JSON.parse(storedUser);
+        // Восстанавливаем дату окончания подписки, если она есть
         if (parsedUser.subscriptionEnd) {
           parsedUser.subscriptionEnd = new Date(parsedUser.subscriptionEnd);
+        }
+        // Восстанавливаем данные о тарифе, если они есть
+        if (parsedUser.tariff) {
+          // Можно добавить дополнительную обработку тарифа при необходимости
         }
         setUser(parsedUser);
         setIsAuthenticated(true);
@@ -147,23 +150,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     }
   }, []);
-
-  const login = (userData: Omit<User, 'id'>) => {
-    const existingUser = mockUsers.find(u => u.phone === userData.phone);
-
-    if (existingUser) {
-      setUser(existingUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('user', JSON.stringify(existingUser));
-    } else {
-      const newUser: User = {
-        id: uuidv4(),
-        ...userData,
-      };
-      setUser(newUser);
-      setIsAuthenticated(true);
-      localStorage.setItem('user', JSON.stringify(newUser));
-    }
+  
+  const login = (userData: User) => {
+    // Сохраняем все данные пользователя, включая тариф
+    setUser(userData);
+    setIsAuthenticated(true);
+    localStorage.setItem('user', JSON.stringify(userData));
   };
 
   const logout = () => {
