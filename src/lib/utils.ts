@@ -54,11 +54,13 @@ export function getTelegramLink(username: string): string {
 // Get class for category pill
 export function getCategoryClass(category: string): string {
   switch (category) {
-    case 'Berries':
+    case 'Дикоросы':
+      return 'category-pill-wild';
+    case 'Ягоды':
       return 'category-pill-berries';
-    case 'Fruits':
+    case 'Фрукты':
       return 'category-pill-fruits';
-    case 'Vegetables':
+    case 'Овощи':
       return 'category-pill-vegetables';
     default:
       return '';

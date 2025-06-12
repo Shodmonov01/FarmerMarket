@@ -28,18 +28,36 @@ export const getCategories = async () => {
 };
 
 // Список продуктов
-export const getProducts = async () => {
+// export const getProducts = async () => {
+//   const accessToken = localStorage.getItem('access_token');
+//   if (!accessToken) {
+//     throw new Error('Access token not found in localStorage');
+//   }
+
+//   return apiRequest<Product[]>('/api/shop/products/', 'GET', {
+//     headers: {
+//       Authorization: `Bearer ${accessToken}`,
+//     },
+//   });
+// };
+
+// Новый универсальный вариант getProducts
+export const getProducts = async (url: string = '/api/shop/products/') => {
   const accessToken = localStorage.getItem('access_token');
   if (!accessToken) {
     throw new Error('Access token not found in localStorage');
   }
 
-  return apiRequest<Product[]>('/api/shop/products/', 'GET', {
+  // Удаляем https://shop2.ibosh-dev.uz, если оно есть
+  const cleanedUrl = url.replace(/^https?:\/\/[^/]+/, '');
+
+  return apiRequest(cleanedUrl, 'GET', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
   });
 };
+
 
 // Продукты по категории
 export const getProductsByCategory = async (categoryId: number) => {
@@ -56,17 +74,34 @@ export const getProductsByCategory = async (categoryId: number) => {
 };
 
 // Продукты по владельцу
-export const getProductsByOwner = async (ownerId: number) => {
+// export const getProductsByOwner = async (ownerId: number) => {
+//   const accessToken = localStorage.getItem('access_token');
+//   if (!accessToken) {
+//     throw new Error('Access token not found in localStorage');
+//   }
+
+//   return apiRequest<Product[]>(`/api/shop/products/owner/${ownerId}/`, 'GET', {
+//     headers: {
+//       Authorization: `Bearer ${accessToken}`,
+//     },
+//   });
+// };
+
+export const getProductsByOwner = async (ownerId: number, page = 1) => {
   const accessToken = localStorage.getItem('access_token');
   if (!accessToken) {
     throw new Error('Access token not found in localStorage');
   }
 
-  return apiRequest<Product[]>(`/api/shop/products/owner/${ownerId}/`, 'GET', {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  return apiRequest<PaginatedResponse<ProductDetail>>(
+    `/api/shop/products/owner/${ownerId}/?page=${page}`,
+    'GET',
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
 };
 
 // Получение продукта по ID

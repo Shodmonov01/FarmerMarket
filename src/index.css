@@ -145,6 +145,9 @@ body {
 .category-pill-vegetables {
   @apply bg-green-100 text-green-800;
 }
+.category-pill-wild {
+  @apply bg-purple-100 text-purple-800;
+}
 
 /* Verified badge */
 .verified-badge {

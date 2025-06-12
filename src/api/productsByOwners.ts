@@ -62,13 +62,26 @@ export const deleteProduct = async (productId: number) => {
 };
 
 // Список продуктов владельца
-export const getOwnerProducts = async () => {
+// export const getOwnerProducts = async () => {
+//   const accessToken = localStorage.getItem('access_token');
+//   if (!accessToken) {
+//     throw new Error('Access token not found in localStorage');
+//   }
+
+//   return apiRequest<ProductDetail[]>('/api/shop/products/owner/', 'GET', {
+//     headers: {
+//       Authorization: `Bearer ${accessToken}`,
+//     },
+//   });
+// };
+
+export const getOwnerProducts = async (page = 1) => {
   const accessToken = localStorage.getItem('access_token');
   if (!accessToken) {
     throw new Error('Access token not found in localStorage');
   }
 
-  return apiRequest<ProductDetail[]>('/api/shop/products/owner/', 'GET', {
+  return apiRequest<PaginatedResponse<ProductDetail>>(`/api/shop/products/owner/?page=${page}`, 'GET', {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
