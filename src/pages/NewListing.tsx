@@ -195,16 +195,16 @@ export default function NewListingPage() {
 
             await createProduct(productData)
 
-            addListing({
-                title: data.name,
-                description: data.description,
-                price: data.price,
-                unit: data.unit_type,
-                category: data.category,
-                images: imagePreviews,
-                sellerId: user.id,
-                location: user.location
-            })
+            // addListing({
+            //     title: data.name,
+            //     description: data.description,
+            //     price: data.price,
+            //     unit: data.unit_type,
+            //     category: data.category,
+            //     images: imagePreviews,
+            //     sellerId: user.id,
+            //     location: user.location
+            // })
 
             toast({
                 title: 'Объявление создано',
@@ -262,8 +262,7 @@ export default function NewListingPage() {
                             <span className='text-xs text-muted-foreground'>Добавить фото</span>
                             <input
                                 type='file'
-                                accept='image/*'
-                                multiple
+                                accept='image/jpeg,image/jpg,image/png,image/webp,.jpg,.jpeg,.png,.webp'
                                 className='hidden'
                                 onChange={handleImageUpload}
                             />

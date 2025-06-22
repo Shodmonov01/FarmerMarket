@@ -58,7 +58,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ tariffId, buttonText, onS
     }
 
     try {
-      const response = await fetch('https://shop2.ibosh-dev.uz/api/auth/create/yookassa/payment/', {
+      const response = await fetch('https://shop3.ibosh-dev.uz/api/auth/create/yookassa/payment/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ const PaymentButton: React.FC<PaymentButtonProps> = ({ tariffId, buttonText, onS
     }
 
     try {
-      const response = await fetch('https://shop2.ibosh-dev.uz/api/auth/check/payment/status/', {
+      const response = await fetch('https://shop3.ibosh-dev.uz/api/auth/check/payment/status/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
